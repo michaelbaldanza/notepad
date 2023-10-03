@@ -1,0 +1,11 @@
+{
+  "name": "notepad",
+  "version": "0.0.1",
+  "manifest_version": 3,
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "permissions": [
+    "sidePanel"
+  ]
+}

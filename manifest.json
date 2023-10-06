@@ -2,10 +2,17 @@
   "name": "notepad",
   "version": "0.0.1",
   "manifest_version": 3,
+  "background": {
+    "service_worker": "js/service-worker.js"
+  },
   "side_panel": {
     "default_path": "sidepanel.html"
   },
+  "action": {
+    "default_title": "Click to open notepad"
+  },
   "permissions": [
+    "storage",
     "sidePanel"
   ]
 }

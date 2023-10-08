@@ -3,31 +3,22 @@
 function handleChromeError() {
   if (chrome.runtime.lastError) {
     console.error(chrome.runtime.lastError);
-  } else {
-    console.log('action successful');
   }
+  return;
 }
 
 async function indexNotes() {
-  console.log(`hitting indexNotes`)
   return chrome.storage.local.get('notes').then((result) => {
-    console.log(result)
     return result;
   });
 }
 
 async function deleteNote(notes) {
-  console.log(`hitting deleteNote`)
   return chrome.storage.local.set({ notes }, handleChromeError);
-  // return chrome.storage.local.remove(note.id).then((result) => {
-  //   console.log(result)
-  // });
 }
 
 async function getNotes() {
-  console.log(`hitting indexNotes`)
   return chrome.storage.local.get('notes').then((result) => {
-    console.log(result)
     return result;
   });
 }
@@ -51,14 +42,11 @@ function saveNote(note) {
 
 /* constants */
 const appTitle = 'Notepad';
-let counter = 0;
 
 const elReplacement = {
   'h1': 'input',
   'p': 'textarea',
 };
-
-
 
 /* state */
 let currentNoteId = '';
@@ -94,7 +82,6 @@ async function app(options) {
   
     lastUpdated = Date.now();
     id = this.createId();
-    cardinal = counter;
   
   
     createId() {
@@ -167,8 +154,7 @@ function createNoteTitle(note) {
   return titleHeading;
 }
 
-function createNote(e) {
-  counter = counter + 1;
+function createNote() {
   const newNote = new Note();
   saveNote(newNote);
   const noteId = newNote.id;
@@ -179,7 +165,6 @@ function createNote(e) {
 }
 
 function makeInput(e) {
-  console.log(`hitting makeInput`)
   const target = e.target;
   const note = currentNote;
   const elName = elReplacement[e.target.localName]
@@ -190,6 +175,7 @@ function makeInput(e) {
   inputEl.innerHTML = value;
   if (elName === 'input') {
     inputEl.setAttribute('value', value);
+    inputEl.setAttribute('type', 'text');
   }
   inputEl.addEventListener('keydown', (e2) => {
     if (e2.key === 'Enter') {
@@ -212,7 +198,8 @@ function makeInput(e) {
 
 function replaceElement(newChild, oldChild) {
   const parent = oldChild.parentNode;
-  return parent.replaceChild(newChild, oldChild);
+  parent.replaceChild(newChild, oldChild);
+  return newChild.focus();
 }
 
 function createNoteBody(note) {
@@ -249,14 +236,10 @@ function createNoteIndex(notes) {
   ul.style.listStyleType = 'none';
   ul.style.padding = '0';
   ul.setAttribute('class', 'note-list');
-  console.log(`got the sortedIds`)
-  console.log(sortedIds)
   for (let nI = 0; nI < notesIds.length; nI++) {
-    
     const li = document.createElement('li');
     li.setAttribute('class', 'note-item');
     const id = sortedIds[nI];
-    console.log(`creatings li for ${id}`)
     const n = notes[id];
     const nText = getTitle(n);
     const a = document.createElement('a');
@@ -294,37 +277,37 @@ function sortLastUpdated(notes) {
   return u;
 }
 
-function makeTrashIconSvg() {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-  svg.setAttribute("width", "16");
-  svg.setAttribute("height", "16");
-  svg.setAttribute("fill", "currentColor");
-  svg.setAttribute("viewBox", "0 0 16 16");
+  function makeTrashIconSvg() {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    svg.setAttribute("width", "16");
+    svg.setAttribute("height", "16");
+    svg.setAttribute("fill", "currentColor");
+    svg.setAttribute("viewBox", "0 0 16 16");
 
-  const path1 = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path1.setAttribute("d", "M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z");
-  
-  const path2 = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path2.setAttribute("d", "M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z");
-  
-  
-  svg.appendChild(path1);
-  svg.appendChild(path2);
+    const path1 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path1.setAttribute("d", "M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z");
+    
+    const path2 = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path2.setAttribute("d", "M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z");
+    
+    
+    svg.appendChild(path1);
+    svg.appendChild(path2);
 
-  return svg;
-}
+    return svg;
+  }
 
 
-/* note methods */
+  /* note methods */
 
-function getDateString(item) {
-  return new Date(item.lastUpdated).toString();
-}
+  function getDateString(item) {
+    return new Date(item.lastUpdated).toString();
+  }
 
-function getTitle(item) {
-  return item.title.length > 0 ? item.title : 'untitled';
-}
+  function getTitle(item) {
+    return item.title.length > 0 ? item.title : 'untitled';
+  }
 
 function updateLastUpdated(item) {
   item.lastUpdated = Date.now();
